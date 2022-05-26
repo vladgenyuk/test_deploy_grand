@@ -1,0 +1,21 @@
+{% extends 'svoy01/layout.html' %}
+
+
+
+{% block content %}
+<h1>log</h1>
+
+<form method="post">
+    {% csrf_token %}
+
+<div class="form-error">{{ form.non_field_errors }}</div>
+
+{% for f in form %}
+    <p><label class="create" for="{{ f.id_for_label }}"></label>{{ f }}</p>
+    <div class="form-error">{{ f.errors }}</div>
+{% endfor %}
+    <h4><a href="{% url 'reset_password' %}">Забыли пароль?</a></h4>
+    <button class="submit" type="submit">Войти</button>
+</form>
+
+{% endblock %}

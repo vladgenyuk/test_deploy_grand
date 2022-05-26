@@ -1,0 +1,43 @@
+{% extends 'svoy01/layout.html' %}
+{% load static %}
+{% block content %}
+
+    <h1>Обьявление: {{ Product.title|title }}</h1>
+<h3>{{ Product.pk }}-ID</h3>
+    {% for p in photos %}
+<img style="object-fit: cover; width: 120px; height: 150px;" src="{{ p.image.url }}">
+{% endfor %}
+        {% if Product.photo %}
+    <img style="object-fit: cover; width: 120px; height: 150px;" src="{{ Product.photo.url }}"/>
+        {% else %}
+    <img style="object-fit: cover; width: 120px; height: 150px;" src="{% static 'svoy01/images/placeholder-1000x1000.png' %}"/>
+        {% endif %}
+<section class="har">
+    <h3 class="cost">Цена: {{ Product.cost }}$</h3>
+
+    {% for c in Category %}
+    {% if c.id == Product.cat_id %}
+        <h3 class="cost">{{ c }}</h3>
+    {% endif %}
+    {% endfor %}
+
+
+    {% if Product.condition == True %}
+        <h3 class="cost">NEW</h3>
+    {% else %}
+        <h3 class="cost">BY</h3>
+    {% endif %}
+    <h2 class="cost">Создано: {{ Product.created }}</h2>
+    <h3>Создал : {{ Product.author }}</h3>
+</section>
+    <h2>{{ Product.text }}</h2>
+    {% if request.user == Product.author %}
+    <a class="delete" href="{% url 'delete' Product.id %}">Удалить обьявление</a>
+    {% endif %}
+{% endblock %}
+
+
+
+
+
+

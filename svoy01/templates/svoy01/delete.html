@@ -1,0 +1,22 @@
+{% extends 'svoy01/layout.html' %}
+{# комментирование!!!!!!!!!!!!!!!!!!!!#}
+{% block title %}Удаление{% endblock %}
+{% load static %}
+
+{% block content %}
+    <div>
+        <h1>Обьявление: {{ Product.title|title }}</h1>
+        <h3>Aвтор : {{ Product.author }}</h3>
+        {% if Product.photo %}
+    <img style="object-fit: cover; width: 120px; height: 150px;" src="{{ Product.photo.url }}"/>
+        {% else %}
+    <img style="object-fit: cover; width: 120px; height: 150px;" src="{% static 'svoy01/images/placeholder-1000x1000.png' %}"/>
+        {% endif %}
+        <h1>Вы точно хотите удалить обьявление??</h1>
+        <form method="post">
+            {% csrf_token %}
+
+            <button class="btn" type="submit">ДА</button>
+        </form>
+    </div>
+{% endblock %}

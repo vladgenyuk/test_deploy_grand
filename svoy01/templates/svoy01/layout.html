@@ -1,0 +1,78 @@
+{% load mptt_tags %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+     <link rel="shortcut icon" href="#" />
+    <link rel="stylesheet" href="{% static 'svoy01/css/styles.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+<!--    <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.24.0/axios.js'></script>-->
+    <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+
+</head>
+<body class="body">
+<header>
+    <a href="{% url 'home' %}"><img style=" width: auto; height: 50px;" src="{% static 'svoy01/images/belarus.jpg' %}"></a>
+    {% if Category_id %}
+    <form class="search" action="{% url 'Category' Category_id=Category_id %}" method="get">
+        <input name="q" type="text" placeholder="Search...">
+    </form>
+    {% endif %}
+</header>
+    <h1><a class='admin' href="{% url 'admin' %}">ADMIN</a></h1>
+
+
+<section>
+    <section class="sec1">
+        <div id="app">
+            <section style="width:50%; margin: 0px; float:left;">
+            {% for c in Category %}
+                {% if c.level == 0 %}
+                        <div class="cat" v-on:click="counter = {{ c.id }}">{{ c }}</div>
+                {% endif %}
+            {% endfor %}
+            </section>
+            <section style="width:50%; margin: 0px; float:right;">
+            {% for c in Category %}
+                {% if c.level == 1 %}
+                    <a class="subcat" v-if="counter == {{ c.parent_id }}"  href="{{ c.get_absolute_url }}">{{ c.name }}</a>
+                {% endif %}
+            {% endfor %}
+            </section>
+            </div>
+    </section>
+        <section class="sec2">
+            {{ count }}
+            {% block content %}{% endblock %}
+
+        </section>
+    <section class="sec3">
+
+        {% if request.user.is_authenticated %}
+        <h2><a href="{% url 'area' %}">{{ user.username }}</a> | <a href="{% url 'logout' %}">Выйти</a></h2>
+            {% if user.profile.photo %}
+        <img style="object-fit: cover; width: 120px; height: 150px;" src="{{ user.profile.photo.url }}"/>
+            {% else %}
+       <img style="object-fit: cover; width: 120px; height: 150px;" src="{% static 'svoy01/images/placeholder-1000x1000.png' %}"/>
+            {% endif %}
+        <a class="acreate" href="{% url 'create' %}">Создать обьявление</a>
+        {% else %}
+        <h2><a href="{% url 'register' %}">Регистрация</a> | <a href="{% url 'login' %}">Войти</a></h2>
+        {% endif %}
+
+        <a href="{% url 'chats' %}"><h3>Чаты</h3></a>
+        <a href="{% url 'allusers' %}"><h3>Allusers</h3></a>
+        {% block area %}{% endblock %}
+
+<!--        <h1>Empty Empty Empty Empty Empty Empty </h1>-->
+<!--        <h1>vlad.nikto.03@mail.ru</h1>-->
+        <h1>Password: qwdfvbn5</h1>
+<!--        <h1>E-password:nzeydh2q4QQannnvwHfa</h1>-->
+    </section>
+</section>
+<script src="{% static 'svoy01/js/vuestyle.js' %}"></script>
+</body>
+</html>
+

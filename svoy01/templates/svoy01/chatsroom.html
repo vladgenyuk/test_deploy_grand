@@ -1,0 +1,16 @@
+{% extends 'svoy01/layout.html' %}
+
+
+
+{% block content %}
+<h1>Комната чатов</h1>
+request.user--{{ request.user.username }}
+{% for c in chats %}
+{% if not request.user == c.owner %}
+<p>{{ c.owner }}--{{ c }}, no Nelzya</p>
+{% else %}
+    <a href="{% url 'room' room_name=c.name %}"><p>{{ c.owner }}--{{ c }}</p></a>
+{% endif %}
+{% endfor %}
+
+{% endblock %}

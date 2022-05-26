@@ -1,0 +1,12 @@
+{% extends 'svoy01/layout.html' %}
+
+{% block content %}
+    <h1>Введите и повторите пароль</h1>
+<form method="post" enctype="multipart/form-data">
+     {% csrf_token %}
+    {% for f in form %}
+    <p>{{ f }}</p>
+    {% endfor %}
+<input type="submit" name="Reset">
+</form>
+{% endblock %}

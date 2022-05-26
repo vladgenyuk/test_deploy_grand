@@ -1,0 +1,27 @@
+{% extends 'svoy01/layout.html' %}
+{% load static %}
+
+{% block content %}
+
+<h1>Обьявление: {{ Product.title|title }}</h1>
+<form action="{% url 'update' Product.id %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    {% if Product.photo %}
+        <img style="object-fit: cover; width: 120px; height: 120px;" src="{{ Product.photo.url }}"/>
+    {% endif %}
+
+    {% for p in photos %}
+    <img style="object-fit: cover; width: 120px; height: 120px;
+border: 3px solid #9610b3;
+border-radius: 3px;
+background-color:#8e549b;"
+src="{{ p.image.url }}">
+    {% endfor %}
+
+    {{ form_images.management_form }}
+    {{ form_images.as_p }}
+
+    <br><button class="btn btn-success" type="submit">Изменить</button>
+</form>
+{% endblock %}
