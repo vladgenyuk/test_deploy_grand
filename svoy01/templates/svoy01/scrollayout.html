@@ -6,23 +6,26 @@
     <title>Title</title>
 </head>
 <body>
+
 <div class="container">
         <div class="book-list">
                 {% if product %}
                 {% for p in product %}
             <div class="card mb-3">
                     <div class="card-body">
-                    <div class="pdiv">
-                        {{ p.pk }}
-                        {% if p.photo %}
-                    <a href='{{ p.get_absolute_url }}'><img style="object-fit: cover; width: 120px; height: 150px;" src="{{ p.photo.url }}"/></a>
-                        {% else %}
-                    <a href='{{ p.get_absolute_url }}'><img style="object-fit: cover; width: 120px; height: 150px;" src="{% static 'svoy01/images/placeholder-1000x1000.png' %}"/></a>
-                        {% endif %}
-                    <a><h2 class="product">{{ p.title }}</h2></a>
-                <h3 class="product">{{ p.cost }}$</h3>
-            <h4 class="product">{{ p.created }}</h4>
-                    </div></div></div>
+                        <div class="pdiv">
+                                {{ p.pk }}
+                                {% if p.photo %}
+                            <a href='{{ p.get_absolute_url }}'><img style="object-fit: cover; width: 120px; height: 150px;" src="{{ p.photo.url }}"/></a>
+                                {% else %}
+                            <a href='{{ p.get_absolute_url }}'><img style="object-fit: cover; width: 120px; height: 150px;" src="{% static 'svoy01/images/placeholder-1000x1000.png' %}"/></a>
+                                {% endif %}
+                            <a><h2 class="product">{{ p.title }}</h2></a>
+                        <h3 class="product">{{ p.cost }}$</h3>
+                    <h4 class="product">{{ p.created }}</h4>
+                        </div>
+                    </div>
+            </div>
                 {% endfor %}
                 {% else %}
                     <p>niet</p>

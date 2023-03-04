@@ -1,41 +1,22 @@
 import json
-from django.conf import settings
+
 from django.contrib.auth import login, logout
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.models import User
-from django.contrib.auth.views import LoginView
-from django.core.mail import send_mail
-from django.core.paginator import Paginator
+from django.contrib.auth.views import LoginView, PasswordResetView
 from django.db import transaction
 from django.http import HttpResponseNotFound, HttpResponse, Http404
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.utils.safestring import mark_safe
-from django.views import View
-from django.views.generic import CreateView, TemplateView, ListView, DetailView, DeleteView, UpdateView
-# from rest_framework.viewsets import ModelViewSet
+from django.views.generic import CreateView, ListView, DetailView, DeleteView, UpdateView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .forms import *
 from .models import Category, PostImage, Profile, Messages, Chat
 from .models import product
-# from .serializers import ProductSe
 from .serializers import AllProductSerializer, DetailProductSerializer, PostImageSerializer
 
-paginate = 4
-
-# def home(request):
-#     contact_list = product.objects.all()
-#     paginator = Paginator(contact_list, 2)
-#     page_number = request.GET.get('page')
-#     page_obj = paginator.get_page(page_number)
-#     context = {
-#         "Category": Category.objects.all(),
-#         "Category_id": 1,
-#         'page_obj': page_obj,
-#     }
-#     return render(request, 'svoy01/main.html', context)
+PAGINATE = 4
 
 
 class AllProducts(APIView):
@@ -77,7 +58,7 @@ def allusers(request):
 
 class home(ListView):
     template_name = 'svoy01/main.html'
-    paginate_by = paginate
+    paginate_by = PAGINATE
     allow_empty = True
     model = product
     context_object_name = "product"
@@ -127,35 +108,11 @@ class chats(ListView):
         pass
 
 
-# class ProductView(ModelViewSet):
-#     queryset = product.objects.all()
-#     serializer_class = ProductSerializer
-
-
-# def post(request, Category_id):
-#     context = {
-#         "Category": Category.objects.all(),
-#         'CAtegory': Category.objects.get(id=Category_id),
-#         'product': product.objects.filter(cat_id=Category_id),
-#     }
-#     return render(request, 'svoy01/category.html', context)
-
-
-# def Product(request, product_slug, ):
-#     context = {
-#         "Category": Category.objects.all(),
-#         'Product': product.objects.get(slug=product_slug)
-#     }
-#     return render(request, 'svoy01/product.html', context)
-
 class ShowProduct(DetailView):
     model = product
     template_name = "svoy01/product.html"
     slug_url_kwarg = 'product_slug'
     context_object_name = "Product"
-
-    # def get_queryset(self):
-    #     return photos.objects.filter(cat_id=self.kwargs['Category_id'])
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -166,7 +123,7 @@ class ShowProduct(DetailView):
 
 
 class ShowCategory(ListView):
-    paginate_by = paginate
+    paginate_by = PAGINATE
     model = product
     template_name = "svoy01/category.html"
     context_object_name = "product"
@@ -232,8 +189,7 @@ class ArticleDeleteView(DeleteView):
         return context
 
     def get_queryset(self):
-        object = product.objects.filter(author=self.request.user.id)
-        return object
+        return product.objects.filter(author=self.request.user.id)
 
 
 class RegisterUser(CreateView):
@@ -264,7 +220,7 @@ class LoginUser(LoginView):
 
 
 class UpdateProduct(UpdateView):
-    template_name = 'svoy01/update.html'
+    template_name = 'svoy01/UpdateProduct.html'
     context_object_name = 'Product'
     model = product
     form_class = AddPostForm
@@ -300,32 +256,59 @@ class PersonalArea(ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(PersonalArea, self).get_context_data()
         context['Category'] = Category.objects.all()
+        context['profile_id'] = self.request.user.id
         context['count'] = product.objects.filter(author=self.request.user.id).count()
         return context
 
     def get_queryset(self):
-            query = product.objects.filter(author=self.request.user.id)
-            return query
+        query = product.objects.filter(author=self.request.user.id)
+        return query
+
+
+class UpdateProfile(UpdateView):
+    template_name = 'svoy01/UpdateProfile.html'
+    context_object_name = 'Profile'
+    model = Profile
+    form_class = ProfileForm
+    success_url = reverse_lazy('home')
+
+    def get_context_data(self, **kwargs):
+        context = super(UpdateProfile, self).get_context_data()
+        context['Category'] = Category.objects.all()
+        context['Profile'] = 1
+        return context
 
 
 def logout_user(request):
     logout(request)
     return redirect('home')
 
-# def blog_view(request):
-#     posts = product.objects.all()
-#     return render(request, 'svoy01/blog.html', {"posts": posts})
-#
-# def detail_view(request, id):
-#     post = get_object_or_404(product, id=id)
-#     photos = PostImage.objects.filter(post=post)
-#     return render(request, 'svoy01/detail.html', {
-#         "post": post, "photos": photos,
-#     })
-
 
 def pageNotFound(request, exception):
     return HttpResponseNotFound('<h1>niet!!<h1>')
+
+
+def create_100(request):
+    for i in range(100):
+        product.objects.create(
+        title=str(i),
+        text=str(i),
+        cat=Category.objects.get(id=5),
+        cost=100
+        )
+    return render(request, 'svoy01/create_100.html')
+
+
+class Reset_Pass(PasswordResetView, ListView):
+    template_name = 'svoy01/area.html'
+    model = product
+    context_object_name = "Product"
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(Reset_Pass, self).get_context_data()
+        context['Category'] = Category.objects.all()
+        return context
+
 
 
 

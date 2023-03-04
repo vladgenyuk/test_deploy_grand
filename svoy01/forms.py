@@ -32,14 +32,8 @@ class AddPostForm(forms.ModelForm):
 class RegisterUserForm(UserCreationForm):
     class Meta:
         model = User
-        fields = ['email', 'username', 'password1', 'password2']
-    #
-    # def __init__(self, *args, **kwargs):
-    #     super(RegisterUserForm, self).__init__(*args, **kwargs)
-    #     self.fields['email'].required = True
-    #
-    #     for name, field in self.fields.items():
-    #         field.widget.attrs.update({'class': 'input'})
+        fields = ['email', 'username', 'password1', 'password2', 'photo']
+
     field_order = ['username', 'email', 'password1', 'password2']
     username = forms.CharField(label='Логин', widget=forms.TextInput(attrs={'class': 'test-input',
                                                                             'placeholder': 'Логин'}))
@@ -49,14 +43,7 @@ class RegisterUserForm(UserCreationForm):
                                                                                  'placeholder': 'Пароль'}))
     password2 = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={'class': 'form-input',
                                                                                  'placeholder': 'Повторите Пароль'}))
-
-# class UserForm(forms.ModelForm):
-#     class Meta:
-#         model = User
-#         fields = ('username', 'email', 'password')
-#         widgets = {
-#             'username': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Название'}),
-#         }
+    photo = forms.ImageField(label='Установить Фото')
 
 
 class ProfileForm(forms.ModelForm):
@@ -68,8 +55,6 @@ class ProfileForm(forms.ModelForm):
 class LoginUserForm(AuthenticationForm):
     email = forms.EmailField(label="email", widget=forms.EmailInput(attrs={'class': 'email-input',
                                                                            'placeholder': 'Email'}))
-    # username = forms.CharField(label='Логин', widget=forms.TextInput(attrs={'class': 'test-input',
-    #                                                                         'placeholder': 'Логин'}))
     password = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={'class': 'form-input',
                                                                                  'placeholder': 'Пароль'}))
 

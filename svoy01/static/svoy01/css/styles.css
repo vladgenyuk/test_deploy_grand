@@ -174,3 +174,9 @@ header{
 .pagg{
 text-align:center;
 }
+
+.user_img{
+border: 10px solid #280DA4;
+border-radius: 40px 40px 40px 0px;
+object-fit: cover; width: 180px; height: 150px;
+}

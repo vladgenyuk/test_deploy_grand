@@ -1,0 +1,21 @@
+{% extends 'svoy01/layout.html' %}
+{% load static %}
+
+{% block content %}
+
+
+<h1>Профиль: {{ Profile.title|title }}</h1>
+<form action="{% url 'UpdateProfile' pk=1 %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    {% if Profile.photo %}
+        <img style="object-fit: cover; width: 120px; height: 120px;" src="{{ Profile.photo.url }}"/>
+    {% else %}
+        <img style="object-fit: cover; width: 120px; height: 150px;" src="{% static 'svoy01/images/placeholder-1000x1000.png' %}"/>
+    {% endif %}
+
+    <br><button class="btn btn-success" type="submit">Изменить</button>
+</form>
+
+{% endblock %}

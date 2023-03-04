@@ -53,9 +53,9 @@
         {% if request.user.is_authenticated %}
         <h2><a href="{% url 'area' %}">{{ user.username }}</a> | <a href="{% url 'logout' %}">Выйти</a></h2>
             {% if user.profile.photo %}
-        <img style="object-fit: cover; width: 120px; height: 150px;" src="{{ user.profile.photo.url }}"/>
+        <img class="user_img" src="{{ user.profile.photo.url }}"/>
             {% else %}
-       <img style="object-fit: cover; width: 120px; height: 150px;" src="{% static 'svoy01/images/placeholder-1000x1000.png' %}"/>
+       <img class="user_img" src="{% static 'svoy01/images/placeholder-1000x1000.png' %}"/>
             {% endif %}
         <a class="acreate" href="{% url 'create' %}">Создать обьявление</a>
         {% else %}
@@ -66,10 +66,13 @@
         <a href="{% url 'allusers' %}"><h3>Allusers</h3></a>
         {% block area %}{% endblock %}
 
-<!--        <h1>Empty Empty Empty Empty Empty Empty </h1>-->
 <!--        <h1>vlad.nikto.03@mail.ru</h1>-->
         <h1>Password: qwdfvbn5</h1>
 <!--        <h1>E-password:nzeydh2q4QQannnvwHfa</h1>-->
+        {% if request.user.is_superuser %}
+            <h3>SUPERUSER</h3>
+            <a href="{% url 'create_100' %}">Create 100</a>
+        {% endif %}
     </section>
 </section>
 <script src="{% static 'svoy01/js/vuestyle.js' %}"></script>

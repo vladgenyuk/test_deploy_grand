@@ -3,7 +3,6 @@
 
 
 {% block content %}
-    {{ CAtegory.name }}
     {% for p in Product %}
     {% if p %}
     <div class="pdiv">
@@ -29,5 +28,6 @@
     <a href="{% url '"></a>
 
 <h4><a href="{% url 'reset_password' %}">Сменить пароль</a></h4>
+<a href="{% url 'UpdateProfile' pk=profile_id%}"><h4>Изменить профиль</h4></a>
 
 {% endblock %}
