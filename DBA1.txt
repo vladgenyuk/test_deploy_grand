@@ -1,0 +1,269 @@
+sudo -i
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+sudo apt-get update
+sudo apt-get -y install postgresql
+systemctl status postgresql
+su -postgres
+psql
+\password postgres
+create user vlad with password 'qseawdzxc1';
+create database test_db;
+grant all privilegies on database test_db to vlad;
+psql -h localhost test_db vlad
+nano /etc/postgresql/15/main/postgresql.conf
+alter //-> listen_addresses = '*' 
+systemctl restart postgresql
+
+./configure --prefix=/home/student/pgsql13 --with-pgport=5555 --without-bzip --without-readline
+export PGDATA=/home/vlad/postgres/pgsql13/data/
+export PATH=/home/vlad/postgres/pgsql13/bin:$PATH
+initdb -U postgres -k // -U User of DB, -k - control summ, -D - catalogue
+pg_ctl start -l /home/vlad/postgres/pgsql13/logfile
+pg_ctl -D /home/vlad/postgres/pgsql13/data2 -l logfile start
+psql -U postgres -p 5555 -c 'SELECT now();'
+pg_ctl stop -m fast/smart/immediate 
+fast — принудительно завершает сеансы и записывает на диск изменения из оперативной памяти;
+smart — ожидает завершения всех сеансов и записывает на диск изменения из оперативной памяти;
+immediate — принудительно завершает сеансы, при запуске потребуется восстановление.
+sudo apt install -y postgresql-13
+sudo ls -l /usr/lib/postgresql/13
+sudo ls -l /var/lib/postgresql/13/main
+sudo pg_ctlcluster 13 main stop // STOP SERVER
+sudo pg_ctlcluster 13 main start
+sudo pg_ctlcluster 13 main status
+sudo pg_ctlcluster 13 main restart
+sudo pg_ctlcluster 13 main reload // 13 - SERVER VERSION, main - SERVER NAME
+ls -l /var/log/postgresql/postgresql-13-main.log
+tail -n 10 /var/log/postgresql/postgresql-13-main.log
+/usr/lib/postgresql/13/bin/pg_checksums -D /home/vlad/postgres/pgsql13/data // checksums
+/usr/lib/postgresql/13/bin/psql -d postgres -U postgres -h localhost -p 5555
+Вы подключены к базе данных "postgres" как пользователь "postgres" (сервер "localhost": адрес "127.0.0.1", порт "5555").
+select schemaname, tablename, tableowner from pg_tables limit 5 \gx;
+\x \t \a \pset fieldsep " " // not neccesarily
+\! pwd, \setenv Test Hello, \! echo $Test
+\o dbal_log
+SELECT format('SELECT count(*) FROM %I;', tablename)
+FROM pg_tables LIMIT 3 \g (tuples_only=on format=unaligned) dbal_log
+\i dbal_log // execute script file
+SELECT format('SELECT count(*) FROM %I;', tablename) FROM pg_tables LIMIT 3 \gexec // exec code
+\set TEST HI!, \echo :TEST, \unset TEST, select now() AS curr_time \gset, \set
+\echo :{?working_dir} // return set/unset variable
+\if :{?working_dir} \else \set working_dir `pwd` \endif
+\d pg_tables
+pg_config --sysconfdir
+set top5 'SELECT tablename, pg_total_relation_size(schemaname||''.''||tablename) AS bytes FROM pg_tables ORDER BY bytes DESC LIMIT 5;'
+:top5
+vlad$ echo "\setenv PAGER 'less -XS'" >> ~/.psqlrc
+echo "\timing on" >> ~/.psqlrc
+echo "\set PROMPT1 '%n@%/%R%# '" >> ~/.psqlrc
+echo "\set PROMPT2 '%n@%/%R%# '" >> ~/.psqlrc
+|||||||||||||||||||
+pg_ctl start -l /home/vlad/postgres/pgsql13/logfile
+/usr/lib/postgresql/13/bin/psql -d postgres -U vlad -h localhost -p 5555
+|||||||||||||||||||
+pg_ctlcluster 13 main reload, SELECT pg_reload_conf();
+show config_file;
+SELECT pg_read_file('/etc/postgresql/13/main/postgresql.conf', 1516, 860) \g (tuples_only=on format=unaligned)
+SELECT name, setting, unit,
+  boot_val, reset_val,
+  source, sourcefile, sourceline,
+  pending_restart, context
+FROM pg_settings
+WHERE name = 'work_mem'\gx
+echo work_mem=8MB | sudo tee -a /home/vlad/postgres/pgsql13/data/postgresql.conf
+SELECT sourceline, name, setting, applied FROM pg_file_settings;
+WHERE sourcefile LIKE '/home/vlad/postgres/pgsql13/data/postgresql.conf';
+SELECT pg_reload_conf();
+ALTER SYSTEM SET work_mem TO '16mb';
+SELECT pg_read_file('postgresql.auto.conf') \g (tuples_only=on format=unaligned)
+SHOW work_mem;
+ALTER SYSTEM RESET work_mem;
+SET work_mem TO '24MB'; 				//session
+SELECT set_config('work_mem', '32MB', false);		//session
+RESET work_mem;
+SET LOCAL work_mem TO '64MB'; -- или set_config('work_mem','64MB',true);
+SELECT CASE
+  WHEN current_setting('myapp.currency_code', true) IS NULL
+    THEN set_config('myapp.currency_code', 'RUB', false)
+  ELSE
+    current_setting('myapp.currency_code')
+END;
+SELECT current_setting('myapp.currency_code');
+\echo :AUTOCOMMIT
+PREPARE q(integer) AS SELECT * FROM t WHERE id = $1;
+EXECUTE q(1);
+SELECT * FROM pg_prepared_statements \gx
+declare c cursor for select * from t order by id;
+fetch 2 c;
+update t set s='123' where id=1;
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+INSERT INTO bloat(d) SELECT current_timestamp FROM generate_series(1,100000);
+CREATE INDEX ON bloat(d);
+UPDATE bloat SET d = d + interval '1 day' WHERE id = 1;
+VACUUM (verbose) bloat;
+CREATE EXTENSION pgstattuple;
+SELECT * FROM pgstattuple('bloat') \gx
+show shared_buffers;
+insert into t select id from generate_series(1, 100000) as id;
+EXPLAIN (analyze, buffers, costs off, timing off) SELECT * FROM t;
+SELECT pg_current_wal_lsn();
+SELECT '0/345C900'::pg_lsn - '0/34598D0'::pg_lsn AS bytes;
+SELECT * FROM pg_ls_waldir() ORDER BY name;
+sudo cat /var/lib/postgresql/13/main/postmaster.pid
+sudo ps -o pid,command --ppid 6323
+\c template1
+SELECT digest('Hello, world!', 'md5');
+ALTER DATABASE db RENAME TO appdb;
+SELECT datname, datistemplate, datallowconn, datconnlimit FROM pg_database;
+SELECT pg_size_pretty(pg_database_size('appdb'));
+create schema myschema;
+create table myschema.table(# id int, s text);
+\dn // describe namespace
+select * from app.t;
+set search_path = public, app;
+create temp table t(n int);
+\dt
+SELECT current_schemas(true);
+alter database vladdb set temp_buffers = '32MB';
+\drds
+create view my_view as select * from t;
+SELECT * FROM pg_database WHERE datname = 'vladdb' \gx
+SELECT * FROM pg_views WHERE schemaname = 'public';
+\set ECHO_HIDDEN on
+SELECT a.attname, a.atttypid FROM pg_attribute a WHERE a.attrelid = (SELECT oid FROM pg_class WHERE relname = 't') AND a.attnum > 0;
+sudo chown postgres /var/lib/postgresql/ts_dir
+CREATE TABLESPACE ts LOCATION '/var/lib/postgresql/ts_dir';
+\db
+CREATE TABLESPACE ts LOCATION '/home/vlad/postgres/pgsql13/ts_dir';
+create database ts_db tablespace ts;
+CREATE TABLE t2(n numeric) TABLESPACE ts;
+SELECT tablename, tablespace FROM pg_tables WHERE schemaname = 'public';
+SELECT pg_size_pretty( pg_tablespace_size('ts') );
+SELECT oid FROM pg_tablespace WHERE spcname = 'ts';
+SELECT datname FROM pg_database WHERE oid IN (SELECT pg_tablespace_databases(16498));
+SELECT count(*) FROM pg_class WHERE reltablespace = 0;
+SELECT pg_relation_filepath('t');
+SELECT oid FROM pg_database WHERE datname = 'vladdb';
+SELECT relfilenode FROM pg_class WHERE relname = 't';
+SELECT pg_relation_size('t','main') main, pg_relation_size('t','fsm') fsm, pg_relation_size('t','vm') vm;
+SELECT length( (123456789::numeric ^ 12345::numeric)::text );
+INSERT INTO t(n) SELECT 123456789::numeric ^ 12345::numeric;
+ALTER TABLE t ALTER COLUMN n SET STORAGE external;
+ALTER SYSTEM SET track_io_timing=on;
+SELECT pg_reload_conf();
+/home/vlad/postgres/pgsql13/bin/pgbench -i admin_monitoring
+/home/vlad/postgres/pgsql13/bin/pgbench -T 10 admin_monitoring
+SELECT * FROM pg_stat_all_tables WHERE relid = 'pgbench_accounts'::regclass \gx
+SELECT * FROM pg_statio_all_tables WHERE relid = 'pgbench_accounts'::regclass \gx
+SELECT * FROM pg_stat_all_indexes WHERE relid = 'pgbench_accounts'::regclass \gx
+SELECT * FROM pg_statio_all_indexes WHERE relid = 'pgbench_accounts'::regclass \gx
+SELECT * FROM pg_stat_database WHERE datname = 'admin_monitoring' \gx
+CHECKPOINT;
+SELECT * FROM pg_stat_bgwriter \gx
+SELECT pid AS blocked_pid FROM pg_stat_activity WHERE backend_type = 'client backend' AND cardinality(pg_blocking_pids(pid)) > 0;
+SELECT locktype, transactionid, pid, mode, granted FROM pg_locks WHERE transactionid IN (SELECT transactionid FROM pg_locks WHERE pid = 16869 AND NOT granted);
+SELECT pg_terminate_backend(b.pid) FROM unnest(pg_blocking_pids(16869)) AS b(pid);
+SELECT pid, backend_type, backend_start, state FROM pg_stat_activity;
+sudo head -n 1 /var/lib/postgresql/13/main/postmaster.pid
+sudo ps -o pid,command --ppid 10113
+sudo grep FATAL /var/log/postgresql/postgresql-13-main.log | tail -n 10
+ALTER SYSTEM SET log_min_duration_statement=0;
+alter system set log_line_prefix='(pid=%p)';
+sudo tail -n 1 /var/log/postgresql/postgresql-13-main.log
+select n_tup_ins,n_tup_del,n_live_tup, n_dead_tup from pg_stat_user_tables;
+\du
+CREATE ROLE alice LOGIN CREATEROLE;
+\c - alice
+ALTER ROLE bob NOLOGIN;
+ALTER ROLE alice NOCREATEROLE;
+grant alice to vlad;
+alter role alice set log_min_duration_statement=0;
+alter role alice login;
+SELECT session_user, current_user;
+tail -n 5 /home/vlad/postgres/pgsql13/logfile
+REASSIGN OWNED BY alice TO bob;
+set role creator;
+---------------
+grant create, usage on schema alice to alice;
+select * from alice.t1; \\ permission denied (bob connect to alice.t1)
+\dn+ alice
+grant create, usage on schema alice to bob;
+vlad=> ALTER SCHEMA alice OWNER TO alice;
+alice=> GRANT CREATE, USAGE ON SCHEMA alice TO bob;
+alice=> GRANT SELECT ON t1 TO bob;
+bob=> select * from alice.t1;
+alice=> GRANT INSERT(n,m) ON t2 TO bob;
+alice=> GRANT SELECT(m) ON t2 TO bob;
+alice=> \dp t2
+bob=> INSERT INTO alice.t2(n,m) VALUES (1,2); \\ OK
+alice=> grant all ON t1 TO bob;
+alice=> GRANT UPDATE ON t2 TO public;
+alice=> GRANT SELECT ON t2 TO bob; \\ для измsенения нужно право просмотра
+alice=> GRANT SELECT,UPDATE ON t1 TO bob WITH GRANT OPTION;
+bob=> GRANT SELECT ON alice.t1 TO charlie WITH GRANT OPTION;
+alice=> REVOKE GRANT OPTION FOR SELECT ON alice.t1 FROM bob CASCADE;
+CREATE FUNCTION foo() RETURNS bigint AS $$ SELECT count(*) FROM t1; $$ LANGUAGE sql;
+select foo();
+SET search_path = public, alice;
+\ddp
+select acldefault('function', 'alice'::regrole);
+alice=> ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON ROUTINES FROM public;
+CREATE FUNCTION bar() RETURNS integer AS $$ SELECT 1; $$ LANGUAGE sql SECURITY DEFINER;
+alter group staff add user bob;
+grant select on table t1 to staff;
+SELECT grantee, grantor, privilege_type, is_grantable FROM information_schema.table_privileges WHERE table_name = 'test';
+SELECT has_table_privilege('alice', 't1', 'SELECT') AS has_select,
+------------
+CREATE POLICY departments ON revenue USING (department = (SELECT department FROM users_depts WHERE login = current_user));
+ALTER TABLE revenue ENABLE ROW LEVEL SECURITY;
+GRANT SELECT ON users_depts, revenue TO alice, bob;
+alice=> SELECT department, sum(amount) FROM revenue GROUP BY department;
+CREATE POLICY amount ON revenue AS RESTRICTIVE USING (true WITH CHECK (abs(amount) <= 100.00);
+GRANT INSERT ON revenue TO bob;
+\d revenue
+------------
+sudo egrep '^[^#]' /etc/postgresql/13/main/pg_hba.conf
+SELECT line_number, type, database, user_name, address, auth_method FROM pg_hba_file_rules;
+SET password_encryption='scram-sha-256';
+alter role vlad password 'zxc';
+sudo tee /etc/postgresql/13/main/pg_hba.conf << EOF
+\\\\\
+local all postgres trust
+local all student  scram-sha-256
+EOF \\\\\
+SELECT pg_reload_conf();
+sudo cp ~/pg_hba.conf.orig /etc/postgresql/13/main/pg_hba.conf
+/usr/lib/postgresql/13/bin/psql 'user=vlad password=zxc host=localhost port=5555 dbname=postgres' -c '\conninfo'
+SELECT rolname, rolpassword FROM pg_authid WHERE rolname IN ('alice','bob') \gx
+------------------
+COPY t TO STDOUT;
+COPY t FROM STDIN;
+\pset null '<null>'
+pg_dump -h localhost -p 5555 -d backup_overview --create
+pg_dump -d backup_overview --table=t -p 5555 -h localhost | /usr/lib/postgresql/13/bin/psql -d backup_overview2 -U vlad -h localhost -p 5555
+pg_lsclusters
+sudo rm -rf /home/student/basebackup
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
