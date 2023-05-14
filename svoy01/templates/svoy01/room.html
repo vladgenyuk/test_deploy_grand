@@ -1,17 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-     <link rel="shortcut icon" href="#" />
-</head>
-<body>
-    <h1>room</h1>
-  <h1>{{ room_name }}</h1>
-    <textarea id="chat-log" cols="100" rows="20"></textarea><br/>
-    <input id="chat-message-input" type="text" size="100"/><br/>
-    <input id="chat-message-submit" type="button" value="Send"/>
-</body>
+{% extends 'svoy01/layout.html' %}
+{% load static %}
+
+{% block content %}
+<section style="width:90%;">
+    <h3>Room {{ room_user.username }}</h3>
+{% if room_user.profile.photo.url %}
+<img class="user_img" src="{{ room_user.profile.photo.url }}">
+{% else %}
+<img class="user_img" src="{% static 'svoy01/images/placeholder-1000x1000.png' %}"/>
+{% endif %}
+</section>
+<section style="background-color: #cfcfcf;">
+    <h1>Request {{ request.user }}</h1>
+<ol class="chat" id="chat-log">
+{% for msg in history %}
+    {% if msg.author != request.user %}
+    <li class="other">
+        <div class="msg">
+            <p>{{ msg }}</p>
+            <time class="time">{{ msg.created }}</time>
+        </div>
+    </li>
+    {% else %}
+    <li class="self">
+        <div class="msg">
+            <p>{{ msg }}</p>
+            <time class="time">{{ msg.created }}</time>
+        </div>
+    </li>
+    {% endif %}
+{% endfor %}
+</ol>
+
+</section>
+
+<input class="input" id="chat-message-input" type="text" size="100"/>
+<input id="chat-message-submit" type="button" value="Send"/>
+
 <script>
     var roomName = {{ room_name_json }};
     var chatSocket = new WebSocket(
@@ -52,4 +77,4 @@
         messageInputDom.value = '';
     };
 </script>
-</html>
+{% endblock %}

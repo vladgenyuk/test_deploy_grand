@@ -10,7 +10,7 @@ from .models import product, Profile, PostImage, Category
 class AddPostForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):                 # конструктор для поля cat вместо ---- (категория не выбрана)
         super().__init__(*args, **kwargs)
-        self.fields['cat'] = forms.ModelChoiceField(queryset=Category.objects.filter(level=1))
+        self.fields['cat'] = forms.ModelChoiceField(queryset=Category.objects.filter(level=1), label="Категория")
         self.fields['cat'].empty_label = "категория не выбрана"
 
     class Meta:
@@ -32,7 +32,7 @@ class AddPostForm(forms.ModelForm):
 class RegisterUserForm(UserCreationForm):
     class Meta:
         model = User
-        fields = ['email', 'username', 'password1', 'password2', 'photo']
+        fields = ['email', 'username', 'password1', 'password2',]# 'photo']
 
     field_order = ['username', 'email', 'password1', 'password2']
     username = forms.CharField(label='Логин', widget=forms.TextInput(attrs={'class': 'test-input',
@@ -43,7 +43,7 @@ class RegisterUserForm(UserCreationForm):
                                                                                  'placeholder': 'Пароль'}))
     password2 = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={'class': 'form-input',
                                                                                  'placeholder': 'Повторите Пароль'}))
-    photo = forms.ImageField(label='Установить Фото')
+    # photo = forms.ImageField(label='Установить Фото')
 
 
 class ProfileForm(forms.ModelForm):

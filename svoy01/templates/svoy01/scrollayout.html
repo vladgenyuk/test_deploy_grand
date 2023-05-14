@@ -14,7 +14,7 @@
             <div class="card mb-3">
                     <div class="card-body">
                         <div class="pdiv">
-                                {{ p.pk }}
+<!--                                {{ p.pk }}-->
                                 {% if p.photo %}
                             <a href='{{ p.get_absolute_url }}'><img style="object-fit: cover; width: 120px; height: 150px;" src="{{ p.photo.url }}"/></a>
                                 {% else %}

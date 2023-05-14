@@ -5,12 +5,18 @@
     <h1>Обьявление: {{ Product.title|title }}</h1>
 <h3>{{ Product.pk }}-ID</h3>
     {% for p in photos %}
-<img style="object-fit: cover; width: 120px; height: 150px;" src="{{ p.image.url }}">
+<img class="product_image" style="object-fit: cover; width: 120px; height: 150px;" src="{{ p.image.url }}">
 {% endfor %}
         {% if Product.photo %}
-    <img style="object-fit: cover; width: 120px; height: 150px;" src="{{ Product.photo.url }}"/>
+    <img class="product_image" style="object-fit: cover; width: 120px; height: 150px;
+        border: 3px solid #9610b3;
+        border-radius: 3px;
+        background-color:#8e549b;" src="{{ Product.photo.url }}"/>
         {% else %}
-    <img style="object-fit: cover; width: 120px; height: 150px;" src="{% static 'svoy01/images/placeholder-1000x1000.png' %}"/>
+    <img style="object-fit: cover; width: 120px; height: 150px;
+        border: 3px solid #9610b3;
+        border-radius: 3px;
+        background-color:#8e549b;" src="{% static 'svoy01/images/placeholder-1000x1000.png' %}"/>
         {% endif %}
 <section class="har">
     <h3 class="cost">Цена: {{ Product.cost }}$</h3>
@@ -22,18 +28,22 @@
     {% endfor %}
 
 
+    <h3>Состояние:
     {% if Product.condition == True %}
-        <h3 class="cost">NEW</h3>
+        NEW
     {% else %}
-        <h3 class="cost">BY</h3>
+        BY
     {% endif %}
-    <h2 class="cost">Создано: {{ Product.created }}</h2>
-    <h3>Создал : {{ Product.author }}</h3>
-</section>
-    <h2>{{ Product.text }}</h2>
+    </h3>
+
+    <h3 >Создано: {{ Product.created }}</h3>
+    <a href="{% url 'room' room_name=Product.author %}"><h3>Создал : {{ Product.author }}</h3></a>
+    <h3 class="product_text">{{ Product.text }}</h3>
     {% if request.user == Product.author %}
     <a class="delete" href="{% url 'delete' Product.id %}">Удалить обьявление</a>
     {% endif %}
+</section>
+
 {% endblock %}
 
 

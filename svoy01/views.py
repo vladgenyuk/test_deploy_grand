@@ -78,19 +78,23 @@ def admin(request):
     return render(request)
 
 
+def get_receiver(name: str, username: str):
+    name = name.split("|")
+    if name[0] == username:
+        return name[1]
+    return name[0]
+
+
 def room(request, room_name):
-    if room_name == str(request.user):
-        return HttpResponse('Sam S Soboy')
-    if not User.objects.filter(username=room_name):
-        return HttpResponse('Net Usera')
-    if not Chat.objects.filter(name=room_name, owner=request.user):
-        Chat.objects.create(name=room_name, owner=request.user)
+    room_name = get_receiver(room_name, request.user.username)
+    if not Chat.objects.filter(name__icontains=room_name):
+        Chat.objects.create(name=room_name + "|" + request.user.username)
     context = {
+        'Category': Category.objects.all(),
         'room_name': room_name,
         'room_name_json': mark_safe(json.dumps(room_name)),
-        'history': Messages.objects.filter(room_name=room_name,
-                                           author=request.user,
-                                           chat_id=Chat.objects.filter(name=room_name, owner=request.user).get().pk,)
+        'history': Messages.objects.filter(chat_id__icontains=room_name),
+        'room_user': User.objects.get(username=room_name)
     }
     return render(request, 'svoy01/room.html', context)
 
@@ -275,7 +279,7 @@ class UpdateProfile(UpdateView):
     def get_context_data(self, **kwargs):
         context = super(UpdateProfile, self).get_context_data()
         context['Category'] = Category.objects.all()
-        context['Profile'] = 1
+        context['Profile'] = self.request.user.id
         return context
 
 

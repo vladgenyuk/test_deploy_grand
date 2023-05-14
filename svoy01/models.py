@@ -15,7 +15,7 @@ from django.core.cache import cache
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    photo = models.ImageField(blank=True, verbose_name='фото')
+    photo = models.ImageField(blank=False, null=False, verbose_name='фото')
     # is_online = models.BooleanField(default=False)
 
     def last_seen(self):
@@ -61,12 +61,12 @@ mptt.register(Category, order_insertion_by=['name'])
 class product(models.Model):
     title = models.CharField(max_length=50, verbose_name='Название')
     author = models.ForeignKey(User, blank=True, null=True, default=None, on_delete=models.PROTECT)
-    text = models.TextField(verbose_name='текст')
+    text = models.TextField(verbose_name='Описание')
     cost = models.PositiveIntegerField(default=None, verbose_name='Стоимость', blank=False, )
-    photo = models.FileField(blank=True, verbose_name='фото')
+    photo = models.FileField(blank=True, verbose_name='Главное фото')
     slug = models.SlugField(max_length=255, unique=False, db_index=True, verbose_name='URL')
     condition = models.BooleanField(default=True)
-    cat = models.ForeignKey('Category', on_delete=models.PROTECT, verbose_name='категория')
+    cat = models.ForeignKey('Category',  verbose_name='Категория', on_delete=models.PROTECT)
     created = models.DateTimeField(auto_now_add=True, auto_now=False, null=True)
 
     def __str__(self):
@@ -102,9 +102,8 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 class Messages(models.Model):
     id = models.AutoField(primary_key=True)
-    chat_id = models.IntegerField(null=True, blank=True)
+    chat_id = models.CharField(max_length=255, null=True, blank=True)
     author = models.ForeignKey(User, default=1, on_delete=models.PROTECT)
-    room_name = models.CharField(max_length=64, blank=True)
     text = models.TextField()
     created = models.DateTimeField(auto_now_add=True, auto_now=False, null=True)
 
@@ -115,7 +114,6 @@ class Messages(models.Model):
 class Chat(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=64)
-    owner = models.ForeignKey(User, default=1, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name

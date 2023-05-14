@@ -52,6 +52,10 @@ class ProfileAdmin(admin.ModelAdmin):
     list_display_links = ('user', 'photo', )
 
 
+class MessageAdmin(admin.ModelAdmin):
+    list_display = ('id', 'chat_id', 'author', 'text', 'created')
+
+
 @admin.register(PostImage)
 class PostImageAdmin(admin.ModelAdmin):
     pass
@@ -60,5 +64,5 @@ class PostImageAdmin(admin.ModelAdmin):
 admin.site.register(Profile, ProfileAdmin)
 admin.site.register(product, ProductAdmin)
 admin.site.register(Category, CategoryAdmin)
-admin.site.register(Messages)
+admin.site.register(Messages, MessageAdmin)
 admin.site.register(Chat)

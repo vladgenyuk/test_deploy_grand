@@ -25,22 +25,20 @@ class ChatConsumer(WebsocketConsumer):
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
-        username = self.scope['user']
+        username = str(self.scope['user'])
 
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
             {
                 'type': 'chat_message',
                 'message': message,
-                'username': str(username),
+                'username': username,
             }
         )
         if message:
             Messages.objects.create(author=self.scope['user'],
                                     text=message,
-                                    room_name=self.room_name,
-                                    chat_id=Chat.objects.filter(name=self.room_name,
-                                                                owner=self.scope['user']).get().pk)
+                                    chat_id=self.room_name + '|' + username,)
 
     def chat_message(self, event):
         message = event['message']

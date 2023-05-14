@@ -21,16 +21,16 @@
     {{ form_images.management_form }}
     <a href="javascript:void(0)" id="add_form">Доп фото...</a><h4 style="display:inline;">  (макс-6)</h4>
     <p><button style="margin:5px;" type="submit">Опубликовать</button></p>
-    <div id="me">Ne vsio</div>
+<!--    <div id="me">Ne vsio</div>-->
 </form>
     <script type="module">
         var form_count = {{form_images.total_form_count}};
-        var form_num = form_count;
+        var form_num = form_count + 1;
         $('#add_form').click(function() {
             form_count++;
             form_num--;
             if (form_num > 0) {
-                var form = '{{form_images.empty_form.as_p|escapejs}}'.replace(/__prefix__/g, form_count - 4);
+                var form = '{{form_images.empty_form.as_p|escapejs}}'.replace(/__prefix__/g, form_count - 6);
                 $('#post_form').append(form)
                 $('#id_form-TOTAL_FORMS').val(form_count);
             } else if (form_num == 0) {
