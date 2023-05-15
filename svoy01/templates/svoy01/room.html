@@ -34,9 +34,10 @@
 
 </section>
 
-<input class="input" id="chat-message-input" type="text" size="100"/>
-<input id="chat-message-submit" type="button" value="Send"/>
-
+<div>
+    <input class="input" id="chat-message-input" type="text"/>
+    <button class="send_button" id="chat-message-submit" type="button"><i class="fa fa-paper-plane-o"></i></button>
+</div>
 <script>
     var roomName = {{ room_name_json }};
     var chatSocket = new WebSocket(

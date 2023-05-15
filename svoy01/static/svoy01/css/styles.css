@@ -252,3 +252,25 @@ time{
     -moz-user-select: none;
     -ms-user-select: none;
 }
+
+.send_button{
+    background-color: #48abe0;
+    color: white;
+    border: none;
+    padding: 0px;
+    font-size: 31px;
+    height: 50px;
+    width: 50px;
+    box-shadow: 0 2px 4px darkslategray;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 70%;
+    position: absolute;
+    right: 30%;
+}
+
+.send_button:active {
+    background-color: #48abe0;
+    box-shadow: 0 0 2px darkslategray;
+    transform: translateY(2px);
+}
