@@ -3,15 +3,21 @@
 
 {% block content %}
 <section style="width:90%;">
-    <h3>Room {{ room_user.username }}</h3>
-{% if room_user.profile.photo.url %}
-<img class="user_img" src="{{ room_user.profile.photo.url }}">
-{% else %}
-<img class="user_img" src="{% static 'svoy01/images/placeholder-1000x1000.png' %}"/>
-{% endif %}
+<!--    <h3>Room {{ room_user.username }}</h3>-->
+            <!--{% if room_user.profile.photo.url %}-->
+            <!--<img class="user_img" src="{{ room_user.profile.photo.url }}">-->
+            <!--{% else %}-->
+            <!--<img class="user_img" src="{% static 'svoy01/images/placeholder-1000x1000.png' %}"/>-->
+            <!--{% endif %}-->
 </section>
+
+<style>
+.body{
+    overflow: hidden;
+}
+</style>
 <section style="background-color: #cfcfcf;">
-    <h1>Request {{ request.user }}</h1>
+<!--    <h1>Request {{ request.user }}</h1>-->
 <ol class="chat" id="chat-log">
 {% for msg in history %}
     {% if msg.author != request.user %}

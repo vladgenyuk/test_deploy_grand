@@ -93,7 +93,7 @@ def room(request, room_name):
         'Category': Category.objects.all(),
         'room_name': room_name,
         'room_name_json': mark_safe(json.dumps(room_name)),
-        'history': Messages.objects.filter(chat_id__icontains=room_name),
+        'history': Messages.objects.filter(chat_id__icontains=room_name)[::-1],
         'room_user': User.objects.get(username=room_name)
     }
     return render(request, 'svoy01/room.html', context)

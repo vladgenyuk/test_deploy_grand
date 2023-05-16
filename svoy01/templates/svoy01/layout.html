@@ -14,15 +14,20 @@
 
 </head>
 <body class="body">
-<header>
+
+<nav class="header">
+    <a style="position: absolute; right: 3%;" href="{% url 'admin' %}">ADMIN</a>
+    {% if user.is_authenticated %}
+        <a class="admin" href="{% url 'create' %}">Создать обьявление</a>
+    {% endif %}
     <a href="{% url 'home' %}"><img style=" width: auto; height: 50px;" src="{% static 'svoy01/images/belarus.jpg' %}"></a>
     {% if Category_id %}
     <form class="search" action="{% url 'Category' Category_id=Category_id %}" method="get">
         <input name="q" type="text" placeholder="Search...">
     </form>
     {% endif %}
-</header>
-    <h1><a class='admin' href="{% url 'admin' %}">ADMIN</a></h1>
+</nav>
+
 
 
 <section>
@@ -52,28 +57,27 @@
     <section class="sec3">
 
         {% if request.user.is_authenticated %}
-        <h2><a href="{% url 'area' %}">{{ user.username }}</a> | <a href="{% url 'logout' %}">Выйти</a></h2>
             {% if user.profile.photo %}
         <img class="user_img" src="{{ user.profile.photo.url }}"/>
             {% else %}
-       <img class="user_img" src="{% static 'svoy01/images/placeholder-1000x1000.png' %}"/>
+        <img class="user_img" src="{% static 'svoy01/images/placeholder-1000x1000.png' %}"/>
             {% endif %}
-        <a class="acreate" href="{% url 'create' %}">Создать обьявление</a>
+        <a class="text" href="{% url 'area' %}">Ваш профиль: {{ user.username }}</a><a class="text" href="{% url 'logout' %}"><h3>Выйти</h3></a>
+        <a class="text" href="{% url 'chats' %}"><h3>Чаты</h3></a>
+        <a class="text" href="{% url 'allusers' %}"><h3>Allusers</h3></a>
         {% else %}
-        <h2><a href="{% url 'register' %}">Регистрация</a> | <a href="{% url 'login' %}">Войти</a></h2>
+        <a class="text" href="{% url 'register' %}"><h3>Регистрация</h3></a><a class="text" href="{% url 'login' %}"><h3>Войти</h3></a>
         {% endif %}
 
-        <a href="{% url 'chats' %}"><h3>Чаты</h3></a>
-        <a href="{% url 'allusers' %}"><h3>Allusers</h3></a>
         {% block area %}{% endblock %}
 
-<!--        <h1>vlad.nikto.03@mail.ru</h1>-->
-        <h1>Password: qwdfvbn5</h1>
-<!--        <h1>E-password:nzeydh2q4QQannnvwHfa</h1>-->
-        {% if request.user.is_superuser %}
-            <h3>SUPERUSER</h3>
+<!--&lt;!&ndash;        <h1>vlad.nikto.03@mail.ru</h1>&ndash;&gt;-->
+<!--        <h3>Password: qwdfvbn5</h3>-->
+<!--&lt;!&ndash;        <h1>E-password:nzeydh2q4QQannnvwHfa</h1>&ndash;&gt;-->
+<!--        {% if request.user.is_superuser %}-->
+<!--            <h3>SUPERUSER</h3>-->
             <a href="{% url 'create_100' %}">Create 100</a>
-        {% endif %}
+<!--        {% endif %}-->
     </section>
 </section>
 <script src="{% static 'svoy01/js/vuestyle.js' %}"></script>
