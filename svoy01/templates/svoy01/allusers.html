@@ -1,25 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-  <h1>ALLUSERS</h1>
+{% extends 'svoy01/layout.html' %}
+{% load static %}
+
+
+{% block content %}
 
 {% for i in allusers %}
-{% with i as p %}
+    {% if i.user.username != request.user.username %}
+        {% with i as p %}
 
- <table>
-   <tr><th>Last Seen</th><td>{% if p.last_seen %}{{ p.last_seen|timesince }}{% else %}awhile{% endif %} ago</td></tr>
-   <tr><th>Online</th><td>{{ p.online }}</td></tr>
- </table>
+         <table>
+           <tr><th>Last Seen</th><td>{% if p.last_seen %}{{ p.last_seen|timesince }}{% else %}awhile{% endif %} ago</td></tr>
+           <tr><th>Online</th><td>{{ p.online }}</td></tr>
+         </table>
 
-{% endwith %}
-    <p>{{ i }}</p><a href="{% url 'room' room_name=i %}">Написать</a>
-
+        {% endwith %}
+            <p>{{ i }}</p><a href="{% url 'room' receiver_id=i.id %}">Написать</a>
+    {% endif %}
 {% endfor %}
 
-<br>
-</body>
-</html>
+{% endblock %}

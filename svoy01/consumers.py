@@ -7,18 +7,18 @@ from .models import Messages, Chat
 
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
-        self.room_name = self.scope['url_route']['kwargs']['room_name']
-        self.room_group_name = 'chat_%s' % self.room_name
+        self.chat_id = self.scope['url_route']['kwargs']['chat_id']
+        self.receiver_group_name = 'chat_%s' % self.chat_id
 
         async_to_sync(self.channel_layer.group_add)(
-            self.room_group_name,
+            self.receiver_group_name,
             self.channel_name
         )
         self.accept()
 
     def disconnect(self, close_code):
         async_to_sync(self.channel_layer.group_discard)(
-            self.room_group_name,
+            self.receiver_group_name,
             self.channel_name
         )
 
@@ -28,7 +28,7 @@ class ChatConsumer(WebsocketConsumer):
         username = str(self.scope['user'])
 
         async_to_sync(self.channel_layer.group_send)(
-            self.room_group_name,
+            self.receiver_group_name,
             {
                 'type': 'chat_message',
                 'message': message,
@@ -36,9 +36,11 @@ class ChatConsumer(WebsocketConsumer):
             }
         )
         if message:
-            Messages.objects.create(author=self.scope['user'],
-                                    text=message,
-                                    chat_id=self.room_name + '|' + username,)
+            Messages.objects.create(
+                author=self.scope['user'],
+                text=message,
+                chat_id=int(self.scope['url_route']['kwargs']['chat_id'])
+            )
 
     def chat_message(self, event):
         message = event['message']

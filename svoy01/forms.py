@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.forms import inlineformset_factory
 
-from .models import product, Profile, PostImage, Category
+from .models import Product, Profile, PostImage, Category
 
 
 class AddPostForm(forms.ModelForm):
@@ -14,14 +14,14 @@ class AddPostForm(forms.ModelForm):
         self.fields['cat'].empty_label = "категория не выбрана"
 
     class Meta:
-        model = product
+        model = Product
         fields = ['title', 'text', 'cost', 'cat', 'photo']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Название'}),
             'text': forms.Textarea(attrs={'cols': 60, 'rows': 10, 'placeholder': 'Описание'}),
         }
 
-    def clean_title(self):                                                                              # validatoin
+    def clean_title(self):
         title = self.cleaned_data['title']
         if len(title) > 50:
             raise ValidationError("длина превышает 50 символов")
@@ -32,7 +32,7 @@ class AddPostForm(forms.ModelForm):
 class RegisterUserForm(UserCreationForm):
     class Meta:
         model = User
-        fields = ['email', 'username', 'password1', 'password2',]# 'photo']
+        fields = ['email', 'username', 'password1', 'password2',]
 
     field_order = ['username', 'email', 'password1', 'password2']
     username = forms.CharField(label='Логин', widget=forms.TextInput(attrs={'class': 'test-input',
@@ -61,7 +61,6 @@ class LoginUserForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
         super(LoginUserForm, self).__init__(*args, **kwargs)
         self.fields['email'].required = True
-        # remove username
         self.fields.pop('username')
 
     def clean(self):
@@ -77,7 +76,7 @@ class ItemImageForm(forms.ModelForm):
 
 
 ItemImageFormSet = inlineformset_factory(
-    product, PostImage, form=ItemImageForm,
+    Product, PostImage, form=ItemImageForm,
     fields=["image"], extra=6, can_delete=False,
     max_num=5, # <- place where you can enter the nr of img
 )

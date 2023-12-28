@@ -10,12 +10,6 @@ class CategoryAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
 
-# admin.site.register(Category, CategoryAdmin)
-# admin.site.register(product, productAdmin)
-# admin.site.site_title = 'Админ-панель 1'
-# admin.site.site_header = 'Админ-панель 2'
-
-
 class PostImageAdmin(admin.StackedInline):
     model = PostImage
     readonly_fields = ('id', 'get_html_photo')
@@ -44,7 +38,7 @@ class ProductAdmin(admin.ModelAdmin):
     get_html_photo.short_description = 'photo'
 
     class Meta:
-        model = product
+        model = Product
 
 
 class ProfileAdmin(admin.ModelAdmin):
@@ -62,7 +56,7 @@ class PostImageAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Profile, ProfileAdmin)
-admin.site.register(product, ProductAdmin)
+admin.site.register(Product, ProductAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Messages, MessageAdmin)
 admin.site.register(Chat)

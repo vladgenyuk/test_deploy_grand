@@ -4,8 +4,13 @@
 
 {% block content %}
 <h1>Комната чатов</h1>
-{% for c in chats %}
-    <a href="{% url 'room' room_name=c.name %}"><p>{{ c }}</p></a>
+{% for c in Chats %}
+    {% for member in c.members.all %}
+        {% if member.username != request.user.username %}
+            <a href="{% url 'room' receiver_id=1 %}"><p>{{ member }}</p></a>
+        {% endif %}
+    {% endfor %}
+
 {% endfor %}
 
 {% endblock %}

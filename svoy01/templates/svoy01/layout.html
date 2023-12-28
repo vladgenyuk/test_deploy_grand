@@ -22,7 +22,7 @@
     {% endif %}
     <a href="{% url 'home' %}"><img style=" width: auto; height: 50px;" src="{% static 'svoy01/images/belarus.jpg' %}"></a>
     {% if Category_id %}
-    <form class="search" action="{% url 'Category' Category_id=Category_id %}" method="get">
+    <form class="search" action="{% url 'category' Category_id=Category_id %}" method="get">
         <input name="q" type="text" placeholder="Search...">
     </form>
     {% endif %}
@@ -50,7 +50,7 @@
             </div>
     </section>
         <section class="sec2">
-            {{ count }}
+            Всего объявлений: {{ count }}
             {% block content %}{% endblock %}
 
         </section>
@@ -64,20 +64,15 @@
             {% endif %}
         <a class="text" href="{% url 'area' %}">Ваш профиль: {{ user.username }}</a><a class="text" href="{% url 'logout' %}"><h3>Выйти</h3></a>
         <a class="text" href="{% url 'chats' %}"><h3>Чаты</h3></a>
-        <a class="text" href="{% url 'allusers' %}"><h3>Allusers</h3></a>
+        <a class="text" href="{% url 'all_users' %}"><h3>Allusers</h3></a>
         {% else %}
         <a class="text" href="{% url 'register' %}"><h3>Регистрация</h3></a><a class="text" href="{% url 'login' %}"><h3>Войти</h3></a>
         {% endif %}
 
         {% block area %}{% endblock %}
+        <h3>Password: qwdfvbn5</h3>
 
-<!--&lt;!&ndash;        <h1>vlad.nikto.03@mail.ru</h1>&ndash;&gt;-->
-<!--        <h3>Password: qwdfvbn5</h3>-->
-<!--&lt;!&ndash;        <h1>E-password:nzeydh2q4QQannnvwHfa</h1>&ndash;&gt;-->
-<!--        {% if request.user.is_superuser %}-->
-<!--            <h3>SUPERUSER</h3>-->
-            <a href="{% url 'create_100' %}">Create 100</a>
-<!--        {% endif %}-->
+        <a href="{% url 'create_100' %}">Create 100</a>
     </section>
 </section>
 <script src="{% static 'svoy01/js/vuestyle.js' %}"></script>

@@ -36,8 +36,8 @@
     {% endif %}
     </h3>
 
-    <h3 >Создано: {{ Product.created }}</h3>
-    <a href="{% url 'room' room_name=Product.author %}"><h3>Создал : {{ Product.author }}</h3></a>
+    <h3>Создано: {{ Product.created }}</h3>
+    <a href="{% url 'room' receiver_id=Product.author.id %}"><h3>Создал : {{ Product.author }}</h3></a>
     <h3 class="product_text">{{ Product.text }}</h3>
     {% if request.user == Product.author %}
     <a class="delete" href="{% url 'delete' Product.id %}">Удалить обьявление</a>

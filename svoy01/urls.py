@@ -6,22 +6,21 @@ from django.views.decorators.cache import cache_page
 
 
 urlpatterns = [
-    path('', (views.home.as_view()), name='home'),
+    path('', views.Home.as_view(), name='home'),
     path('admin/', views.admin, name='admin'),
-    path('Category/<int:Category_id>/', views.ShowCategory.as_view(), name='Category'),
-    path('Product/<int:pk>/', cache_page(60)(views.ShowProduct.as_view()), name='product'),
-    path('Create/', login_required(views.create.as_view()), name='create'),
-    path('Delete/<int:pk>', login_required(views.ArticleDeleteView.as_view()), name='delete'),
-    path('Register/', views.RegisterUser.as_view(), name='register'),
-    path('Logout/', views.logout_user, name='logout'),
-    path('Login/', views.LoginUser.as_view(), name='login'),
-    path('Area/', views.PersonalArea.as_view(), name='area'),
-    path('UpdateProduct/<int:pk>/', views.UpdateProduct.as_view(), name='update'),
-    path('UpdateProfile/<int:pk>/', views.UpdateProfile.as_view(), name='UpdateProfile'),
-    path('create_100', views.create_100, name='create_100'),
+    path('category/<int:Category_id>/', views.ShowCategory.as_view(), name='category'),
+    path('product/<int:pk>/', cache_page(60)(views.ShowProduct.as_view()), name='product'),
+    path('create/', login_required(views.create.as_view()), name='create'),
+    path('delete/<int:pk>', login_required(views.ArticleDeleteView.as_view()), name='delete'),
+    path('register/', views.RegisterUser.as_view(), name='register'),
+    path('logout/', views.logout_user, name='logout'),
+    path('login/', views.LoginUser.as_view(), name='login'),
+    path('area/', views.PersonalArea.as_view(), name='area'),
+    path('updateProduct/<int:pk>/', views.UpdateProduct.as_view(), name='update'),
+    path('updateProfile/<int:pk>/', views.UpdateProfile.as_view(), name='update_profile'),
 
     path('reset_password',
-         views.Reset_Pass.as_view(template_name='svoy01/reset_password.html'),
+         views.ResetPass.as_view(template_name='svoy01/reset_password.html'),
          name='reset_password'),
     path('reset_password_sent',
          auth_views.PasswordResetDoneView.as_view(template_name='svoy01/reset_password_sent.html'),
@@ -33,10 +32,9 @@ urlpatterns = [
          auth_views.PasswordResetCompleteView.as_view(template_name='svoy01/reset_password_complete.html'),
          name='password_reset_complete'),
 
-    path('Chats/', views.chats.as_view(), name='chats'),
-    path('Chats/<str:room_name>/', views.room, name='room'),
-    path('allusers', views.allusers, name='allusers'),
-    path('api/AllProducts/', views.AllProducts.as_view(), name='AllProducts'),
-    path('api/AllProducts/<int:pk>/', views.DetailProduct.as_view(), name='DetailProduct'),
-    path('api/postimages/<int:pk>/', views.PostImagesView.as_view(), name='PostImages')
+    path('chats/', views.Chats.as_view(), name='chats'),
+    path('chats/<int:receiver_id>', views.room, name='room'),
+    path('all_users', views.all_users, name='all_users'),
+    path('create_100', views.create_10, name='create_100'),
 ]
+

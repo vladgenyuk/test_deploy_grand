@@ -11,10 +11,10 @@
         {% else %}
     <a href='{{ p.get_absolute_url }}'><img style="object-fit: cover; width: 120px; height: 150px;" src="{% static 'svoy01/images/placeholder-1000x1000.png' %}"/></a>
         {% endif %}
-    <a><h2 class="product">{{ p.title }}</h2></a>
-    <h3 class="product">{{ p.cost }}$</h3>
-    <h4 class="product">{{ p.created }}</h4>
-        <h5 class="product"><a href="{% url 'update' p.pk %}">update</a></h5>
+    <a><h2 class="Product">{{ p.title }}</h2></a>
+    <h3 class="Product">{{ p.cost }}$</h3>
+    <h4 class="Product">{{ p.created }}</h4>
+        <h5 class="Product"><a href="{% url 'update' p.pk %}">update</a></h5>
     </div>
     {% else %}
         <p>niet</p>
@@ -25,9 +25,8 @@
 
 
 {% block area %}
-    <a href="{% url '"></a>
 
 <h4><a href="{% url 'reset_password' %}">Сменить пароль</a></h4>
-<a href="{% url 'UpdateProfile' pk=profile_id%}"><h4>Изменить профиль</h4></a>
+<a href="{% url 'update_profile' pk=profile_id%}"><h4>Изменить профиль</h4></a>
 
 {% endblock %}

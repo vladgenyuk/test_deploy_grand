@@ -16,7 +16,6 @@ from django.core.cache import cache
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     photo = models.ImageField(blank=False, null=False, verbose_name='фото')
-    # is_online = models.BooleanField(default=False)
 
     def last_seen(self):
         return cache.get('seen_%s' % self.user)
@@ -36,6 +35,12 @@ class Profile(models.Model):
         return f'{self.user}'
 
 
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+
+
 class Category(MPTTModel):
     name = models.CharField(max_length=50, unique=True)
     parent = TreeForeignKey('self', on_delete=models.CASCADE, blank=True, null=True, related_name='children')
@@ -52,13 +57,13 @@ class Category(MPTTModel):
         return f'{self.name}'
 
     def get_absolute_url(self):
-        return reverse('Category', kwargs={'Category_id': self.id})
+        return reverse('category', kwargs={'Category_id': self.id})
 
 
 mptt.register(Category, order_insertion_by=['name'])
 
 
-class product(models.Model):
+class Product(models.Model):
     title = models.CharField(max_length=50, verbose_name='Название')
     author = models.ForeignKey(User, blank=True, null=True, default=None, on_delete=models.PROTECT)
     text = models.TextField(verbose_name='Описание')
@@ -87,22 +92,24 @@ class product(models.Model):
 
 
 class PostImage(models.Model):
-    post = models.ForeignKey('product', default=None, on_delete=models.CASCADE, related_name='postimages')
+    post = models.ForeignKey('Product', default=None, on_delete=models.CASCADE, related_name='postimages')
     image = models.ImageField()
 
     def __str__(self):
         return self.post.title
 
 
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
+class Chat(models.Model):
+    id = models.AutoField(primary_key=True)
+    members = models.ManyToManyField(User, blank=True)
+
+    def __str__(self):
+        return f"{self.id}"
 
 
 class Messages(models.Model):
     id = models.AutoField(primary_key=True)
-    chat_id = models.CharField(max_length=255, null=True, blank=True)
+    chat = models.ForeignKey(Chat, null=True, blank=True, on_delete=models.PROTECT)
     author = models.ForeignKey(User, default=1, on_delete=models.PROTECT)
     text = models.TextField()
     created = models.DateTimeField(auto_now_add=True, auto_now=False, null=True)
@@ -111,9 +118,4 @@ class Messages(models.Model):
         return self.text
 
 
-class Chat(models.Model):
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=64)
 
-    def __str__(self):
-        return self.name

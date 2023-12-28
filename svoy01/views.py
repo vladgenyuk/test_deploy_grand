@@ -3,109 +3,97 @@ import json
 from django.contrib.auth import login, logout
 from django.contrib.auth.views import LoginView, PasswordResetView
 from django.db import transaction
-from django.http import HttpResponseNotFound, HttpResponse, Http404
+from django.http import HttpResponseNotFound
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.utils.safestring import mark_safe
 from django.views.generic import CreateView, ListView, DetailView, DeleteView, UpdateView
-from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from .forms import *
 from .models import Category, PostImage, Profile, Messages, Chat
-from .models import product
-from .serializers import AllProductSerializer, DetailProductSerializer, PostImageSerializer
+from .models import Product
 
 PAGINATE = 4
 
 
-class AllProducts(APIView):
-
-    def get(self, request, format=None):
-        products = product.objects.all()
-        serializer = AllProductSerializer(products, many=True)
-        return Response(serializer.data)
-
-
-class DetailProduct(APIView):
-
-    def get_object(self, pk):
-        try:
-            return product.objects.get(pk=pk)
-        except product.DoesNotExist:
-            raise Http404
-
-    def get(self, request, pk, format=None):
-        product = self.get_object(pk)
-        postimages = PostImage.objects.filter(post=pk)
-        serializer = DetailProductSerializer(product)
-        return Response(serializer.data)
-
-
-class PostImagesView(APIView):
-    def get(self, request, pk, format=None):
-        postimages = PostImage.objects.filter(post=pk)
-        serializer = PostImageSerializer(postimages, many=True)
-        return Response(serializer.data)
-
-
-def allusers(request):
+def all_users(request):
     context = {
         'allusers': Profile.objects.all(),
+        'Category': Category.objects.all()
     }
     return render(request, 'svoy01/allusers.html', context)
-
-
-class home(ListView):
-    template_name = 'svoy01/main.html'
-    paginate_by = PAGINATE
-    allow_empty = True
-    model = product
-    context_object_name = "product"
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['Category'] = Category.objects.all()
-        context['Category_id'] = 1
-        context['count'] = product.objects.count()
-        return context
-
-    def get_queryset(self):
-        return product.objects.all()
 
 
 def admin(request):
     return render(request)
 
 
-def get_receiver(name: str, username: str):
-    name = name.split("|")
-    if name[0] == username:
-        return name[1]
-    return name[0]
-
-
-def room(request, room_name):
-    room_name = get_receiver(room_name, request.user.username)
-    if not Chat.objects.filter(name__icontains=room_name):
-        Chat.objects.create(name=room_name + "|" + request.user.username)
+def room(request, receiver_id: int):
+    user = User.objects.get(pk=receiver_id)
+    chat = Chat.objects.filter(members__in=[request.user]).intersection(
+        Chat.objects.filter(members__in=[user]))
+    if not chat:
+        chat = Chat.objects.create()
+        chat.members.set([request.user, user])
+    else:
+        chat = chat[0]
+    receiver_name = user.username
     context = {
         'Category': Category.objects.all(),
-        'room_name': room_name,
-        'room_name_json': mark_safe(json.dumps(room_name)),
-        'history': Messages.objects.filter(chat_id__icontains=room_name)[::-1],
-        'room_user': User.objects.get(username=room_name)
+        'receiver_name': receiver_name,
+        'chat_id': chat.id,
+        'receiver_name_json': mark_safe(json.dumps(receiver_name)),
+        'history': Messages.objects.filter(chat_id=chat.id),
     }
     return render(request, 'svoy01/room.html', context)
 
 
-class chats(ListView):
+def logout_user(request):
+    logout(request)
+    return redirect('home')
+
+
+def pageNotFound(request, exception):
+    return HttpResponseNotFound('<h1>niet!!<h1>')
+
+
+def create_10(request):
+    for i in range(10):
+        Product.objects.create(
+        author_id=1,
+        title=str(i),
+        text=str(i),
+        cat_id=6,
+        cost=100
+        )
+    return redirect('home')
+
+
+class Home(ListView):
+    template_name = 'svoy01/main.html'
+    paginate_by = PAGINATE
+    allow_empty = True
+    model = Product
+    context_object_name = "Product"
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['Category'] = Category.objects.all()
+        context['Category_id'] = 1
+        context['count'] = Product.objects.count()
+        return context
+
+    def get_queryset(self):
+        return Product.objects.all()
+
+
+class Chats(ListView):
     template_name = 'svoy01/chatsroom.html'
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['Category'] = Category.objects.all()
-        context['chats'] = Chat.objects.all()
+        context['Chats'] = Chat.objects.prefetch_related('members').all()
         return context
 
     def get_queryset(self):
@@ -113,8 +101,8 @@ class chats(ListView):
 
 
 class ShowProduct(DetailView):
-    model = product
-    template_name = "svoy01/product.html"
+    model = Product
+    template_name = "svoy01/Product.html"
     slug_url_kwarg = 'product_slug'
     context_object_name = "Product"
 
@@ -128,9 +116,9 @@ class ShowProduct(DetailView):
 
 class ShowCategory(ListView):
     paginate_by = PAGINATE
-    model = product
+    model = Product
     template_name = "svoy01/category.html"
-    context_object_name = "product"
+    context_object_name = "Product"
     allow_empty = True
 
     def get_queryset(self):
@@ -139,26 +127,26 @@ class ShowCategory(ListView):
         if not query:
             query = ""
         if self.kwargs['Category_id'] == 1:
-            object_list = product.objects.filter(title__icontains=query)
+            object_list = Product.objects.filter(title__icontains=query)
         else:
-            object_list = product.objects.filter(title__icontains=query, cat_id=self.kwargs['Category_id'])
+            object_list = Product.objects.filter(title__icontains=query, cat_id=self.kwargs['Category_id'])
         return object_list
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = context['product']
+        context['title'] = context['Product']
         context["Category_id"] = self.kwargs['Category_id']
         context['Category'] = Category.objects.all()
-        context['count'] = product.objects.filter(cat_id=self.kwargs['Category_id'], title__icontains=query).count()
+        context['count'] = Product.objects.filter(cat_id=self.kwargs['Category_id'], title__icontains=query).count()
         return context
 
 
 class create(CreateView):
-    model = product
+    model = Product
     form_class = AddPostForm
-    context_object_name = "product"
+    context_object_name = "Product"
     template_name = 'svoy01/create.html'
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('Home')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(create, self).get_context_data(**kwargs)
@@ -182,10 +170,10 @@ class create(CreateView):
 
 
 class ArticleDeleteView(DeleteView):
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('Home')
     template_name = 'svoy01/delete.html'
     context_object_name = "Product"
-    model = product
+    model = Product
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -193,7 +181,7 @@ class ArticleDeleteView(DeleteView):
         return context
 
     def get_queryset(self):
-        return product.objects.filter(author=self.request.user.id)
+        return Product.objects.filter(author=self.request.user.id)
 
 
 class RegisterUser(CreateView):
@@ -226,7 +214,7 @@ class LoginUser(LoginView):
 class UpdateProduct(UpdateView):
     template_name = 'svoy01/UpdateProduct.html'
     context_object_name = 'Product'
-    model = product
+    model = Product
     form_class = AddPostForm
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -254,18 +242,18 @@ class UpdateProduct(UpdateView):
 
 class PersonalArea(ListView):
     template_name = 'svoy01/area.html'
-    model = product
+    model = Product
     context_object_name = "Product"
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(PersonalArea, self).get_context_data()
         context['Category'] = Category.objects.all()
         context['profile_id'] = self.request.user.id
-        context['count'] = product.objects.filter(author=self.request.user.id).count()
+        context['count'] = Product.objects.filter(author=self.request.user.id).count()
         return context
 
     def get_queryset(self):
-        query = product.objects.filter(author=self.request.user.id)
+        query = Product.objects.filter(author=self.request.user.id)
         return query
 
 
@@ -283,38 +271,12 @@ class UpdateProfile(UpdateView):
         return context
 
 
-def logout_user(request):
-    logout(request)
-    return redirect('home')
-
-
-def pageNotFound(request, exception):
-    return HttpResponseNotFound('<h1>niet!!<h1>')
-
-
-def create_100(request):
-    for i in range(100):
-        product.objects.create(
-        title=str(i),
-        text=str(i),
-        cat=Category.objects.get(id=5),
-        cost=100
-        )
-    return render(request, 'svoy01/create_100.html')
-
-
-class Reset_Pass(PasswordResetView, ListView):
+class ResetPass(PasswordResetView, ListView):
     template_name = 'svoy01/area.html'
-    model = product
+    model = Product
     context_object_name = "Product"
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        context = super(Reset_Pass, self).get_context_data()
+        context = super(ResetPass, self).get_context_data()
         context['Category'] = Category.objects.all()
         return context
-
-
-
-
-
-#password qwedsacxz1
