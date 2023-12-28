@@ -13,6 +13,4 @@ run pip install -r requirements.txt
 
 copy . .
 
-workdir svoy1
-
-cmd gunicorn wsgi:application --log-file -
+cmd python manage,py runserver
