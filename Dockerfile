@@ -13,6 +13,4 @@ run pip install -r requirements.txt
 
 copy . .
 
-
-
 cmd gunicorn svoy1.wsgi:application -w 4
