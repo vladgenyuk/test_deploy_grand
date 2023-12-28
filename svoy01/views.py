@@ -61,9 +61,9 @@ def create_10(request):
     for i in range(10):
         Product.objects.create(
         author_id=1,
-        title=str(i),
+        title='Title ' + str(i),
         text=str(i),
-        cat_id=6,
+        cat_id=5,
         cost=100
         )
     return redirect('home')

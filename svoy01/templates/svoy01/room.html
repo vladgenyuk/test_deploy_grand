@@ -46,7 +46,7 @@
 </div>
 <script>
     var chatSocket = new WebSocket(
-        'ws://' + window.location.host + '/ws/' + '{{ chat_id }}' + '/');
+        'wss://' + window.location.host + '/ws/' + '{{ chat_id }}' + '/');
 
     chatSocket.onmessage = function(e) {
         var data = JSON.parse(e.data);
