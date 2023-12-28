@@ -15,4 +15,4 @@ copy . .
 
 workdir svoy1
 
-cmd gunicorn social.wsgi:application --log-file -
+cmd gunicorn svoy1.wsgi:application --log-file -
