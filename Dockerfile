@@ -15,4 +15,4 @@ copy . .
 
 
 
-cmd gunicorn svoy1.wsgi:application --log-file
+cmd gunicorn svoy1.wsgi:application -w 4
