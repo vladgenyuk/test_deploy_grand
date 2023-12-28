@@ -8,8 +8,9 @@ workdir /app
 
 copy requirements.txt .
 
-run pip install -U pip setuptools
+run pip install --upgrade pip setuptools wheel
 run pip install -r requirements.txt
+
 copy . .
 
 workdir svoy1
