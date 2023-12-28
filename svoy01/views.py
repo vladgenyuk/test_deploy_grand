@@ -102,7 +102,7 @@ class Chats(ListView):
 
 class ShowProduct(DetailView):
     model = Product
-    template_name = "svoy01/Product.html"
+    template_name = "svoy01/product.html"
     slug_url_kwarg = 'product_slug'
     context_object_name = "Product"
 
