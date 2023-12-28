@@ -146,7 +146,7 @@ class create(CreateView):
     form_class = AddPostForm
     context_object_name = "Product"
     template_name = 'svoy01/create.html'
-    success_url = reverse_lazy('Home')
+    success_url = reverse_lazy('home')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(create, self).get_context_data(**kwargs)
@@ -170,7 +170,7 @@ class create(CreateView):
 
 
 class ArticleDeleteView(DeleteView):
-    success_url = reverse_lazy('Home')
+    success_url = reverse_lazy('home')
     template_name = 'svoy01/delete.html'
     context_object_name = "Product"
     model = Product
