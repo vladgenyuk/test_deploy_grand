@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     # 'debug_toolbar',
     'mptt',
     'channels',
-    'rest_framework',
     'django_cleanup.apps.CleanupConfig',
 ]
 
