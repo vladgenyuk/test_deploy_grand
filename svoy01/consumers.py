@@ -2,13 +2,14 @@ import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 
-from .models import Messages, Chat
+from .models import Messages
 
 
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
         self.chat_id = self.scope['url_route']['kwargs']['chat_id']
         self.receiver_group_name = 'chat_%s' % self.chat_id
+        print(self.scope)
 
         async_to_sync(self.channel_layer.group_add)(
             self.receiver_group_name,
