@@ -8,6 +8,7 @@ workdir /app
 
 copy requirements.txt .
 
+run pip install --upgrade pip setuptools wheel
 run pip install -r requirements.txt
 
 copy . .
